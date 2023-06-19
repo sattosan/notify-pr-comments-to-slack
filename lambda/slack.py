@@ -29,7 +29,11 @@ def convert_slack_mentions(github_mentions: list[str]) -> list[str]:
 
 # GitHubのユーザ名と対応するSlackのユーザ名を返す
 def select_slack_user_name(github_user_name: str) -> str | None:
-    return mention_dic[github_user_name]
+    github_mention = f"@{github_user_name}"
+    if github_user_name in mention_dic:
+        return mention_dic[github_mention]
+
+    return None
 
 
 # Slackのメンションテキストを作成する
