@@ -10,9 +10,9 @@ mention_dic = fixtures.mention_dic
 
 # テキストからメンションを抽出する
 def extract_mentions(text: str) -> list[str]:
-    # @から空白または\r\nまたは行末までの部分をマッチさせるパターン
-    pattern = r'@.*?(?=\s|\r\n|$)'
-    mentions = re.findall(pattern, text, re.DOTALL)
+    # @から空白または改行までの部分をマッチさせるパターン
+    mention_pattern = re.compile(r'@.*?(?=\s|$)')
+    mentions: list[str] = mention_pattern.findall(text)
     # 重複したメンションを削除して返す
     return list(set(mentions))
 
@@ -59,7 +59,7 @@ def create_send_data(user: str | None, mentions: list[str], comment_text: str, c
 
 
 # Slackにメッセージを送信
-def post_slack(user: str | None, comment_text: str, comment_url: str, webhooks_url: str):
+def post_slack(user: str | None, comment_text: str, comment_url: str, webhooks_url: str) -> None:
     github_mentions: list[str] = extract_mentions(comment_text)
     slack_mentions: list[str] = convert_slack_mentions(github_mentions)
     send_data: dict = create_send_data(user, slack_mentions, comment_text, comment_url)
