@@ -11,12 +11,12 @@ def lambda_handler(event, _):
         # リクエストが無効だった場合
         return body
 
+    pr_owner: str = body["pull_request"]["user"]["login"]
+    reviewer: str = body["comment"]["user"]["login"]
+    comment: str = body["comment"]["body"]
+    comment_url: str = body["comment"]["html_url"]
     SLACK_WEBHOOKS_URL = secret["SLACK_WEBHOOKS_URL"]
-    comment = body["comment"]
-    user_name: str | None = slack.select_slack_user_name(comment["user"]["login"])
-    slack.post_slack(user_name, comment['body'], comment["html_url"], SLACK_WEBHOOKS_URL)
 
-    return {
-        'statusCode': 200,
-        'body': '{"message": "send message to slack"}'
-    }
+    slack.post_slack(reviewer, pr_owner, comment, comment_url, SLACK_WEBHOOKS_URL)
+
+    return {"statusCode": 200, "body": '{"message": "send message to slack"}'}

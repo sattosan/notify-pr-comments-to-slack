@@ -1,4 +1,2 @@
 # key: GitHubのユーザID, value: SlackのユーザID
-mention_dic = {
-    "@sattosan": "sato.yuya1211"
-}
+mention_dic = {"@sattosan": "sato.yuya1211"}
