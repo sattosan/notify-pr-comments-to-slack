@@ -3,7 +3,7 @@ import re
 
 import fixtures
 import urllib3
-from github import GitBodyForSlack
+from git_body_for_slack import GitBodyForSlack
 
 http = urllib3.PoolManager()
 mention_dic = fixtures.mention_dic

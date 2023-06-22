@@ -1,7 +1,7 @@
 import settings
 import slack
 import validate
-from github import GitBodyForSlack
+from git_body_for_slack import GitBodyForSlack
 
 
 # エントリーポイント
@@ -12,9 +12,9 @@ def lambda_handler(event, _):
         # リクエストが無効だった場合
         return body
 
-    git_body_for_slack: GitBodyForSlack = GitBodyForSlack.from_event_body(body)
+    body_for_slack: GitBodyForSlack = GitBodyForSlack.from_event_body(body)
     SLACK_WEBHOOKS_URL = secret["SLACK_WEBHOOKS_URL"]
 
-    slack.post_slack(git_body_for_slack, SLACK_WEBHOOKS_URL)
+    slack.post_slack(body_for_slack, SLACK_WEBHOOKS_URL)
 
     return {"statusCode": 200, "body": '{"message": "send message to slack"}'}
