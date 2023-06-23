@@ -1,12 +1,12 @@
 import json
 import re
 
-import fixtures
 import urllib3
-from git_body_for_slack import GitBodyForSlack
+
+from .fixtures import mention_dic
+from .git_body_for_slack import GitBodyForSlack
 
 http = urllib3.PoolManager()
-mention_dic = fixtures.mention_dic
 
 
 # テキストからメンションを抽出する
@@ -36,6 +36,7 @@ def convert_slack_mentions(
 
 # GitHubのユーザ名と対応するSlackのユーザ名を返す
 def select_slack_user_name(github_user_name: str | None) -> str | None:
+    print(mention_dic)
     if not github_user_name:
         return None
 
