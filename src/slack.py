@@ -3,8 +3,8 @@ import re
 
 import urllib3
 
-from .fixtures import mention_dic
-from .git_body_for_slack import GitBodyForSlack
+from fixtures import mention_dic
+from git_body_for_slack import GitBodyForSlack
 
 http = urllib3.PoolManager()
 

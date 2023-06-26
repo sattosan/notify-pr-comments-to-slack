@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "notify-pr-comments-to-slack"
+version = "0.1.0"
+description = ""
+authors = ["sattosan <sato.yuya1211@gmail.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = ["tests",]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+urllib3 = "^2.0.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

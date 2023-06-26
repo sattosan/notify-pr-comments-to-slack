@@ -44,7 +44,7 @@ class TestConvertSlackMentions(unittest.TestCase):
             expected_slack_mentions,
         )
 
-    @patch.dict("src.fixtures.mention_dic", {"@user1": "slack_user1"})
+    @patch.dict("fixtures.mention_dic", {"@user1": "slack_user1"})
     def test_mentions_found(self):
         github_mentions = ["@user2", "@user3"]
         pr_owner = "user1"
@@ -57,7 +57,7 @@ class TestConvertSlackMentions(unittest.TestCase):
         )
 
     @patch.dict(
-        "src.fixtures.mention_dic", {"@user1": "slack_user1", "@user2": "slack_user2"}
+        "fixtures.mention_dic", {"@user1": "slack_user1", "@user2": "slack_user2"}
     )
     def test_mentions_not_found(self):
         github_mentions = ["@user2", "@user3"]
@@ -78,22 +78,22 @@ class TestSelectSlackUserName(unittest.TestCase):
 
     def test_valid_github_user_name(self):
         # 正常な入力のテストケース
-        with patch.dict("src.fixtures.mention_dic", self.mocked_mention_dic):
+        with patch.dict("fixtures.mention_dic", self.mocked_mention_dic):
             self.assertEqual(slack.select_slack_user_name("user1"), "slack_user1")
 
     def test_empty_github_user_name(self):
         # 空の入力のテストケース
-        with patch.dict("src.fixtures.mention_dic", self.mocked_mention_dic):
+        with patch.dict("fixtures.mention_dic", self.mocked_mention_dic):
             self.assertEqual(slack.select_slack_user_name(""), None)
 
     def test_none_github_user_name(self):
         # Noneの入力のテストケース
-        with patch.dict("src.fixtures.mention_dic", self.mocked_mention_dic):
+        with patch.dict("fixtures.mention_dic", self.mocked_mention_dic):
             self.assertEqual(slack.select_slack_user_name(None), None)
 
     def test_missing_mention_in_dic(self):
         # mention_dicに該当するユーザ名が存在しない場合のテストケース
-        with patch.dict("src.fixtures.mention_dic", self.mocked_mention_dic):
+        with patch.dict("fixtures.mention_dic", self.mocked_mention_dic):
             self.assertEqual(slack.select_slack_user_name("user3"), None)
 
 
