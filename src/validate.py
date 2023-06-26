@@ -7,11 +7,11 @@ def validate_request(event, secret):
     if secret is None:
         return False, {"statusCode": 400, "body": "Bad Request"}
 
-    if "headers" not in event or "X-Hub-Signature" not in event["headers"]:
+    if "headers" not in event or "x-hub-signature" not in event["headers"]:
         return False, {"statusCode": 400, "body": "Bad Request"}
     headers = event["headers"]
     # HMAC値による簡易認証処理
-    signature = headers["X-Hub-Signature"]
+    signature = headers["x-hub-signature"]
     signedBody = (
         "sha1="
         + hmac.new(
