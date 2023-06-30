@@ -178,7 +178,7 @@ class TestCreateSendData(unittest.TestCase):
 
         expected_result = json.dumps(
             {
-                "channel": "#pf-search-pr-notice-for-guest",
+                "channel": "#test",
                 "text": "以下のコメントがありました\n```None```\nlink: None",
             }
         ).encode("utf-8")
@@ -195,7 +195,7 @@ class TestCreateSendData(unittest.TestCase):
 
         expected_result = json.dumps(
             {
-                "channel": "#pf-search-pr-notice-for-guest",
+                "channel": "#test",
                 "text": "<@user1> <@user2>\n*reviewer* さんから以下のコメントがありました\n```This is a comment.```\nlink: http://example.com",
             }
         ).encode("utf-8")

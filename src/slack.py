@@ -81,7 +81,7 @@ def create_send_data(
     formatted_mentions = create_mention_text(mentions)
     formatted_reviewer = f"*{reviewer}* さんから" if reviewer else ""
     message = f"{formatted_mentions}{formatted_reviewer}以下のコメントがありました\n```{comment}```\nlink: {comment_url}"
-    data = {"channel": "#pf-search-pr-notice-for-guest", "text": message}
+    data = {"channel": "#test", "text": message}
     return json.dumps(data).encode("utf-8")
 
 
