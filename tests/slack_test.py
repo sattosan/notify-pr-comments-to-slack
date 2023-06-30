@@ -35,38 +35,83 @@ class TestExtractMentions(unittest.TestCase):
 
 
 class TestConvertSlackMentions(unittest.TestCase):
-    def test_no_mentions(self):
-        github_mentions = []
-        pr_owner = "user1"
-        expected_slack_mentions = [None]
-        self.assertEqual(
-            slack.convert_slack_mentions(github_mentions, pr_owner),
-            expected_slack_mentions,
-        )
+    @patch.dict(
+        "fixtures.mention_dic", {"@user1": "slack_user1", "@user2": "slack_user2"}
+    )
+    def test_convert_slack_mentions_with_mentions(self):
+        github_mentions = ["@user1", "@user2"]
+        pr_owner = "user3"
+        reviewer = "user4"
+        expected_output = ["slack_user1", "slack_user2"]
 
-    @patch.dict("fixtures.mention_dic", {"@user1": "slack_user1"})
-    def test_mentions_found(self):
-        github_mentions = ["@user2", "@user3"]
-        pr_owner = "user1"
-        expected_slack_mentions = ["slack_user1"]
-        actual = slack.convert_slack_mentions(github_mentions, pr_owner)
-        print(actual)
-        self.assertEqual(
-            slack.convert_slack_mentions(github_mentions, pr_owner),
-            expected_slack_mentions,
-        )
+        result = slack.convert_slack_mentions(github_mentions, pr_owner, reviewer)
+
+        self.assertEqual(result, expected_output)
 
     @patch.dict(
         "fixtures.mention_dic", {"@user1": "slack_user1", "@user2": "slack_user2"}
     )
-    def test_mentions_not_found(self):
-        github_mentions = ["@user2", "@user3"]
+    def test_convert_slack_mentions_without_mentions(self):
+        github_mentions = []
         pr_owner = "user1"
-        expected_slack_mentions = ["slack_user2"]
-        self.assertEqual(
-            slack.convert_slack_mentions(github_mentions, pr_owner),
-            expected_slack_mentions,
-        )
+        reviewer = "user2"
+        expected_output = ["slack_user1"]
+
+        result = slack.convert_slack_mentions(github_mentions, pr_owner, reviewer)
+
+        self.assertEqual(result, expected_output)
+
+    @patch.dict(
+        "fixtures.mention_dic", {"@user1": "slack_user1", "@user2": "slack_user2"}
+    )
+    def test_convert_slack_mentions_ignore_github_actions(self):
+        github_mentions = ["user1"]
+        pr_owner = "user2"
+        reviewer = "github-actions[bot]"
+        expected_output = None
+
+        result = slack.convert_slack_mentions(github_mentions, pr_owner, reviewer)
+
+        self.assertEqual(result, expected_output)
+
+    @patch.dict(
+        "fixtures.mention_dic", {"@user1": "slack_user1", "@user2": "slack_user2"}
+    )
+    def test_convert_slack_mentions_self_mention(self):
+        github_mentions = ["@user1"]
+        pr_owner = "user1"
+        reviewer = "user1"
+        expected_output = ["slack_user1"]
+
+        result = slack.convert_slack_mentions(github_mentions, pr_owner, reviewer)
+
+        self.assertEqual(result, expected_output)
+
+    @patch.dict(
+        "fixtures.mention_dic", {"@user1": "slack_user1", "@user2": "slack_user2"}
+    )
+    def test_convert_slack_mentions_ignore_self_mention(self):
+        github_mentions = []
+        pr_owner = "user1"
+        reviewer = "user1"
+        expected_output = None
+
+        result = slack.convert_slack_mentions(github_mentions, pr_owner, reviewer)
+
+        self.assertEqual(result, expected_output)
+
+    @patch.dict(
+        "fixtures.mention_dic", {"@user1": "slack_user1", "@user2": "slack_user2"}
+    )
+    def test_convert_slack_mentions_no_mentions(self):
+        github_mentions = []
+        pr_owner = "user1"
+        reviewer = "user2"
+        expected_output = ["slack_user1"]
+
+        result = slack.convert_slack_mentions(github_mentions, pr_owner, reviewer)
+
+        self.assertEqual(result, expected_output)
 
 
 class TestSelectSlackUserName(unittest.TestCase):
@@ -133,7 +178,7 @@ class TestCreateSendData(unittest.TestCase):
 
         expected_result = json.dumps(
             {
-                "channel": "#test",
+                "channel": "#pf-search-pr-notice-for-guest",
                 "text": "以下のコメントがありました\n```None```\nlink: None",
             }
         ).encode("utf-8")
@@ -150,7 +195,7 @@ class TestCreateSendData(unittest.TestCase):
 
         expected_result = json.dumps(
             {
-                "channel": "#test",
+                "channel": "#pf-search-pr-notice-for-guest",
                 "text": "<@user1> <@user2>\n*reviewer* さんから以下のコメントがありました\n```This is a comment.```\nlink: http://example.com",
             }
         ).encode("utf-8")

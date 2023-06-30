@@ -23,20 +23,37 @@ def extract_mentions(text: str | None) -> list[str]:
 
 # GitHubのメンションを探し、見つかれば対応するSlackのユーザ名を返す
 def convert_slack_mentions(
-    github_mentions: list[str], pr_owner: str | None
+    github_mentions: list[str], pr_owner: str | None, reviewer: str | None
 ) -> list[str]:
+    print(
+        f"github_mentions: {github_mentions}, pr_owner: {pr_owner}, reviewer: {reviewer}"
+    )
+    # BOTのコメントは無視する
+    if reviewer in ["github-actions[bot]", "sonarcloud[bot]"]:
+        return None
+
     slack_mentions: list[str] = []
     for mention in github_mentions:
         if mention in mention_dic:
             slack_mentions.append(mention_dic[mention])
 
+    if slack_mentions:
+        return slack_mentions
+
+    """
+    # TODO バグがありそうなのでコメントアウト
+    # 自分宛てのコメントは無視する
+    if pr_owner == reviewer:
+        return None
+    """
+
     # コメントにメンションがなければ変わりにPR作者にメンションする
-    return slack_mentions if slack_mentions else [select_slack_user_name(pr_owner)]
+    pr_owner_slack_user_name = select_slack_user_name(pr_owner)
+    return [pr_owner_slack_user_name] if pr_owner_slack_user_name else None
 
 
 # GitHubのユーザ名と対応するSlackのユーザ名を返す
 def select_slack_user_name(github_user_name: str | None) -> str | None:
-    print(mention_dic)
     if not github_user_name:
         return None
 
@@ -64,14 +81,21 @@ def create_send_data(
     formatted_mentions = create_mention_text(mentions)
     formatted_reviewer = f"*{reviewer}* さんから" if reviewer else ""
     message = f"{formatted_mentions}{formatted_reviewer}以下のコメントがありました\n```{comment}```\nlink: {comment_url}"
-    data = {"channel": "#test", "text": message}
+    data = {"channel": "#pf-search-pr-notice-for-guest", "text": message}
     return json.dumps(data).encode("utf-8")
 
 
 # Slackにメッセージを送信
 def post_slack(body: GitBodyForSlack, webhooks_url: str) -> None:
     github_mentions: list[str] = extract_mentions(body.comment)
-    slack_mentions: list[str] = convert_slack_mentions(github_mentions, body.pr_owner)
+    slack_mentions: list[str] = convert_slack_mentions(
+        github_mentions, body.pr_owner, body.reviewer
+    )
+
+    # Slackのメンションが見つからなければ通知しない
+    if not slack_mentions:
+        return None
+
     send_data: dict = create_send_data(
         slack_mentions, body.reviewer, body.comment, body.comment_url
     )

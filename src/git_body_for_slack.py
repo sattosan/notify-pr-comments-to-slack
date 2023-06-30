@@ -7,16 +7,18 @@ class GitBodyForSlack:
     pr_owner: str | None
     comment: str | None
     comment_url: str | None
+    repository: str | None
 
     # GitHub Webhooksから送信されたbodyから自クラスを生成する
     @staticmethod
     def from_event_body(body):
         pr_owner: str | None = GitBodyForSlack._select_pr_owner(body)
         reviewer: str | None = body.get("comment", {}).get("user", {}).get("login")
-        comment: str | None = body.get("comment", {}).get("body", {})
-        comment_url: str | None = body.get("comment", {}).get("html_url", {})
+        comment: str | None = body.get("comment", {}).get("body")
+        comment_url: str | None = body.get("comment", {}).get("html_url")
+        repository: str | None = body.get("repository", {}).get("name")
 
-        return GitBodyForSlack(reviewer, pr_owner, comment, comment_url)
+        return GitBodyForSlack(reviewer, pr_owner, comment, comment_url, repository)
 
     # PR作者のGitHub IDを取得する
     @staticmethod
